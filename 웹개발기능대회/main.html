@@ -57,8 +57,9 @@
 
   <script>
     // 카드에 들어갈 정보들 get해오기 + 템플릿에 저장
+    let itemGet;
     $.get('data/store.json').done((data) => {
-      let itemGet = data.products
+      itemGet = data.products
       itemGet.forEach((a, i) => {
         let itemTemplate =
           `<div class="card mx-3">
@@ -73,6 +74,57 @@
         $('.card-group').append(itemTemplate)
       })
     })
+
+
+
+    //일단 상품명 가져와
+    let titles = [];
+
+    $(document).ready(function () {
+      var cardTitleText = $('.card-title');
+      for (let i = 0; i < cardTitleText.length; i++) {
+        titles.push(cardTitleText.eq(i).html())
+      }
+    });
+
+    //input값 filter 기능
+    $('.search').on('input', () => {
+      var inputText = $('.search').val() // 입력값
+      //상품명중 for문 돌려서 inputText를 가진 상품의 card만 보여줘
+      var showItem = [];
+      titles.forEach((a) => {
+        //인풋 조건에 맞는게 있으면 card 깨끗히 비우고 조건맞는것만 보여줘
+        if (a.includes(inputText)) {
+          $('.card').hide();
+          showItem.push(a)
+          console.log(showItem)
+        }
+      })
+      showItem.forEach((item) => {
+        //쇼아이템에 있는거 카드로 보여줘
+        itemGet.forEach((a) => {
+          if (a.title == item) {
+            let itemTemplate =
+              `<div class="card mx-3">
+            <img src="data/${a.photo}" class="card-img-top">
+            <div class="card-body">
+              <h5 class="card-title fw-bold">${a.title}</h5>
+              <p class="card-text mb-1"><small class="text-body-secondary">${a.brand}</small></p>
+              <p class="card-text ">가격 : ${a.price}</p>
+              <button type="button" class="btn btn-dark">담기</button>
+            </div>
+          </div>`;
+            $('.card-group').append(itemTemplate)
+          }
+        })
+      })
+    })
+
+
+
+
+
+
   </script>
 
   <!-- 장바구니 -->
