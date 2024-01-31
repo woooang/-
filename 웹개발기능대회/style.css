@@ -1,0 +1,72 @@
+body,html {
+  width: 100%;
+  margin: 0;
+}
+
+.bg-212529 {
+  background-color: #212529;
+}
+
+#white {
+  color: white;
+}
+
+/*  */
+
+.search-container{
+  padding-top: 50px;
+  padding-bottom: 50px;
+  margin: 0;
+  padding-left: 0;
+}
+
+.search {
+  width: 300px;
+  height: 40px;
+}
+
+.card {
+  border: none;
+  width: 85vw;
+  padding: 0;
+}
+
+.card-group {
+  width: 90vw;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.card img{
+  width: 80%;
+  display: block;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.cart {
+  background-color: #E2E2E2;
+  height: 500px;
+  width: 90vw;
+  box-sizing: border-box;
+}
+
+.cart h5 {
+  padding-top: 40px;
+  margin-left: 50px;;
+}
+
+.cart-black {
+  margin: auto;
+  height: 400px;
+  width: 95%;
+  position: relative;
+}
+
+.cart-black p {
+  position: absolute;
+  top: 50%;
+  right: 45%;
+  font-weight: bolder;
+  font-size: 22px;
+}
