@@ -141,32 +141,36 @@
 
     function drop(ev) {
       var data;
-      if (ev.target.id =="cart-drop"){  //이벤트 버블링 방지
+      if (ev.target.id == "cart-drop") {  //이벤트 버블링 방지
         ev.preventDefault();
         data = ev.dataTransfer.getData("text");
       };
+
+      console.log(cartElements)
+      console.log(data)
 
       //중복일 경우 숫자 늘려가기
       if (cartElements.includes(data)) {
         let add = $(`#cart-drop #${data}`).find('.cart-count').html();
         add++;
+        console.log("왜그래")
         $(`#${data} .cart-count`).remove();
         $(`#cart-drop #${data}`).find('.card-body')
-        .append(`<div class="cart-count">${add}</div>`)
+          .append(`<div class="cart-count">${add}</div>`);
       } else {
         //"여기로 드래그" 숨기기
         $('.cart-black>p').hide()
         draggedElement = document.getElementById(data);
         //복사본을 드래그해서 붙여줘
-        var copyElement = draggedElement.cloneNode(true); 
+        var copyElement = draggedElement.cloneNode(true);
         event.target.appendChild(copyElement);
         //장바구니 카드 드래그 금지
-        $(".cart-black .card").prop("draggable", false); 
+        $(".cart-black .card").prop("draggable", false);
         //상품 개수
-        var num = 1
+        var num = 1 ;
         $(`#cart-drop #${data}`).find('.card-body')
-        .append(`<div class="cart-count">${num}</div>`)
-  
+          .append(`<div class="cart-count">${num}</div>`)
+        cartElements.push(data)
       }
 
     }
