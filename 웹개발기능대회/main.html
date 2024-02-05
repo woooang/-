@@ -67,7 +67,7 @@
 
     //템플릿
     var template = (a, i) => {
-      let itemTemplate =
+      var itemTemplate =
         `<div id='drag${i}' class="card mx-3" draggable="true" ondragstart="drag(event)">
             <img src="data/${a.photo}" class="card-img-top" draggable="false">
             <div class="card-body">
@@ -77,15 +77,16 @@
               <button type="button" class="btn btn-dark">담기</button>
             </div>
           </div>`;
-      $('.card-group').append(itemTemplate)
+      return itemTemplate
     }
 
     // 카드에 들어갈 정보들 get해오기
-    let itemGet;
+    var itemGet;
     $.get('data/store.json').done((data) => {
       itemGet = data.products
+      console.log(itemGet)
       itemGet.forEach((a, i) => {
-        template(a, i)
+        $('.card-group').append(template(a, i));
       })
     })
 
@@ -114,7 +115,7 @@
       showItem.forEach((item) => {
         itemGet.forEach((a, i) => {
           if (a.title == item) {
-            template(a, i)
+            $('.card-group').append(template(a, i));
 
             // 노란색 배경 입히기
             // 인풋값과 일치하는 단어에 노랑배경
@@ -138,22 +139,16 @@
     }
 
     var cartElements = [];
-
     function drop(ev) {
       var data;
       if (ev.target.id == "cart-drop") {  //이벤트 버블링 방지
         ev.preventDefault();
         data = ev.dataTransfer.getData("text");
       };
-
-      console.log(cartElements)
-      console.log(data)
-
       //중복일 경우 숫자 늘려가기
       if (cartElements.includes(data)) {
         let add = $(`#cart-drop #${data}`).find('.cart-count').html();
         add++;
-        console.log("왜그래")
         $(`#${data} .cart-count`).remove();
         $(`#cart-drop #${data}`).find('.card-body')
           .append(`<div class="cart-count">${add}</div>`);
@@ -167,13 +162,42 @@
         //장바구니 카드 드래그 금지
         $(".cart-black .card").prop("draggable", false);
         //상품 개수
-        var num = 1 ;
+        var num = 1;
         $(`#cart-drop #${data}`).find('.card-body')
           .append(`<div class="cart-count">${num}</div>`)
         cartElements.push(data)
       }
-
     }
+
+    //담기버튼 누르면 장바구니에 추가
+    $(document).ready(function () {
+      $('button').on('click', function (e) {
+        //지금클릭한 card를 장바구니에 그대로 추가해줘
+        var inCart = $(e.target).parents('.card').attr('id');
+        var itemNum = inCart[inCart.length - 1]
+        itemGet.forEach((a, i) => {
+          if (i == itemNum) {
+            if (cartElements.includes(inCart)) {
+              console.log('안녕')
+              let add = $(`#cart-drop #${inCart}`).find('.cart-count').html();
+              add++;
+              $(`#${inCart} .cart-count`).remove();
+              $(`#cart-drop #${inCart}`).find('.card-body')
+                .append(`<div class="cart-count">${add}</div>`);
+            } else {
+              $('.cart-black>p').hide()
+              $('.cart-black').append(template(a, i))
+              $(".cart-black .card").prop("draggable", false);
+              //상품 개수
+              var num = 1;
+              $(`#cart-drop #${inCart}`).find('.card-body')
+                .append(`<div class="cart-count">${num}</div>`)
+              cartElements.push(inCart)
+            }
+          }
+        })
+      });
+    });
 
 
   </script>

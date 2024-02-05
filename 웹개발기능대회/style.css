@@ -48,7 +48,7 @@ body,html {
 
 .cart {
   background-color: #E2E2E2;
-  height: 550px;
+  height: 600px;
   width: 90vw;
   box-sizing: border-box;
 }
@@ -60,7 +60,7 @@ body,html {
 
 .cart-black {
   margin: auto;
-  height: 450px;
+  height: 500px;
   width: 95%;
   position: relative;
   display: flex;
@@ -70,7 +70,7 @@ body,html {
 
 .cart-black .card {
   display: block;
-  height: 70%;
+  max-width: 250px;
   text-align: center;
 }
 
