@@ -30,6 +30,7 @@ body,html {
   width: 85vw;
   padding: 0;
   max-width: 20vw;
+  cursor: move;
 }
 
 .card-group {
@@ -47,7 +48,7 @@ body,html {
 
 .cart {
   background-color: #E2E2E2;
-  height: 500px;
+  height: 550px;
   width: 90vw;
   box-sizing: border-box;
 }
@@ -59,15 +60,43 @@ body,html {
 
 .cart-black {
   margin: auto;
-  height: 400px;
+  height: 450px;
   width: 95%;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.cart-black p {
+.cart-black .card {
+  display: block;
+  height: 70%;
+  text-align: center;
+}
+
+.cart-black button{
+  display: none;
+}
+
+.cart-black h5 {
+  margin: auto;
+  padding: 0;
+}
+
+.cart-black p{
+  margin-bottom: 10px;
+}
+
+.cart-black>p {
   position: absolute;
   top: 50%;
   right: 45%;
   font-weight: bolder;
   font-size: 22px;
+}
+
+.cart-count {
+  border: 1px solid grey;
+  text-align: left;
+  padding-left: 5px;
 }
