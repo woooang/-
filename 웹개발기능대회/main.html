@@ -16,6 +16,34 @@
 
 <body style="background-color: #eee;">
 
+  <!-- 모달창 -->
+  <div class="black-bg">
+    <div class="white-bg">
+      <h4 class="fw-bold mb-3">성함</h4>
+      <div class="mb-3">
+        <input>
+      </div>
+      <h4 class="fw-bold mb-3">연락처</h4>
+      <div class="mb-4">
+        <input>
+      </div>
+      <button type="button" class="btn btn-dark">입력완료</button>
+      <button type="button" class="btn btn-dark">닫기</button>
+    </div>
+  </div>
+
+  <!-- 캔버스 -->
+  <div class="none-bg">
+    <div class="receipt shadow">
+      <div>
+        <h2 class="p-3 fw-bold">영수증</h2>
+      </div>
+      <canvas id="canvas" width="550" height="500"></canvas>
+      <hr class="mb-3">
+      <button type="button" style='margin-left: 460px; margin-bottom: 10px;'>닫기</button>
+    </div>
+  </div>
+
   <!-- navbar -->
   <nav class="navbar navbar-expand-lg bg-212529">
     <div class="container-fluid">
@@ -54,17 +82,17 @@
   </div>
 
   <!-- 장바구니 -->
-  <div class="cart mx-4 mt-4 ">
-    <h5 class="fw-bold">장바구니</h5>
+  <div class="cart mx-4 mt-4">
+    <h5 class="fw-bold pt-5 ms-5">장바구니</h5>
     <div id="cart-drop" class="cart-black bg-212529" ondrop="drop(event)" ondragover="allowDrop(event)">
       <p id="white">여기로 드래그</p>
     </div>
+    <h5 class="fw-bold pt-3 ms-4 ">최종가격</h5>
+    <p class="cart-total ms-4">합계</p>
+    <button type="button" class="btn btn-dark ms-4 mb-3">구매하기</button>
   </div>
 
-
-
   <script>
-
     //템플릿
     var template = (a, i) => {
       var itemTemplate =
@@ -73,7 +101,7 @@
             <div class="card-body">
               <h5 class="card-title fw-bold">${a.title}</h5>
               <p class="card-text mb-1"><small class="text-body-secondary">${a.brand}</small></p>
-              <p class="card-text ">가격 : ${a.price}</p>
+              <p class="card-text card-price"><span>가격 : </span>${a.price}</p>
               <button type="button" class="btn btn-dark">담기</button>
             </div>
           </div>`;
@@ -84,13 +112,12 @@
     var itemGet;
     $.get('data/store.json').done((data) => {
       itemGet = data.products
-      console.log(itemGet)
       itemGet.forEach((a, i) => {
         $('.card-group').append(template(a, i));
       })
     })
 
-    //일단 상품명 가져와
+    //메인화면에 보여질 상품
     let titles = [];
     $(document).ready(function () {
       var cardTitleText = $('.card-title'); //지금 html에 있는 class='card-title' 
@@ -101,13 +128,12 @@
 
     //input값 filter 기능
     $('.search').on('input', () => {
-      var inputText = $('.search').val() // 입력값
-      var showItem = []; //필터링해서 보여줄 상품
-      //인풋 조건에 맞는게 있으면 card 깨끗히 비우고 조건맞는것만 선별
+      var inputText = $('.search').val()
+      var showItem = [];
       titles.forEach((a) => {
         if (a.includes(inputText)) {
-          $('.card').hide();
-          showItem.push(a)
+          $('.card').remove();
+          showItem.push(a);
         }
       })
 
@@ -131,14 +157,24 @@
       })
     })
 
-    //drag and drop
+    //장바구니 기능 (drag+drop+button)
+    var cartElements = [];
+    var total = 0;
+
     function allowDrop(ev) { ev.preventDefault(); }
 
     function drag(ev) {
       ev.dataTransfer.setData("text", ev.target.id);
     }
 
-    var cartElements = [];
+    function totalAdd(a) {
+      let itemPrice = $(`#cart-drop #${a}`).find('.card-price').text();
+      if (itemPrice) { //if문 없으면 Nan 오류남
+        total += parseInt(itemPrice);
+        $('.cart-total').html("합계 " + total);
+      }
+    }
+
     function drop(ev) {
       var data;
       if (ev.target.id == "cart-drop") {  //이벤트 버블링 방지
@@ -159,27 +195,28 @@
         //복사본을 드래그해서 붙여줘
         var copyElement = draggedElement.cloneNode(true);
         event.target.appendChild(copyElement);
-        //장바구니 카드 드래그 금지
         $(".cart-black .card").prop("draggable", false);
+        $('#cart-drop span').remove()
         //상품 개수
         var num = 1;
         $(`#cart-drop #${data}`).find('.card-body')
           .append(`<div class="cart-count">${num}</div>`)
         cartElements.push(data)
       }
+      //total 금액 더하기
+      totalAdd(data)
     }
 
     //담기버튼 누르면 장바구니에 추가
     $(document).ready(function () {
+      var inCart;
       $('button').on('click', function (e) {
-        //지금클릭한 card를 장바구니에 그대로 추가해줘
-        var inCart = $(e.target).parents('.card').attr('id');
-        var itemNum = inCart[inCart.length - 1]
+        inCart = $(e.target).parents('.card').attr('id');
+        var add = 1;
         itemGet.forEach((a, i) => {
-          if (i == itemNum) {
+          if (`drag${i}` == inCart) {
             if (cartElements.includes(inCart)) {
-              console.log('안녕')
-              let add = $(`#cart-drop #${inCart}`).find('.cart-count').html();
+              add = $(`#cart-drop #${inCart}`).find('.cart-count').html();
               add++;
               $(`#${inCart} .cart-count`).remove();
               $(`#cart-drop #${inCart}`).find('.card-body')
@@ -187,6 +224,7 @@
             } else {
               $('.cart-black>p').hide()
               $('.cart-black').append(template(a, i))
+              $('#cart-drop span').remove()
               $(".cart-black .card").prop("draggable", false);
               //상품 개수
               var num = 1;
@@ -196,9 +234,70 @@
             }
           }
         })
+        //합계에 추가
+        totalAdd(inCart);
       });
     });
 
+    //modal
+    $('.cart button').on('click', function () {
+      $('.black-bg').fadeIn()
+    })
+
+    $('.black-bg button').eq(1).on('click', function () {
+      $('.black-bg').fadeOut()
+
+    })
+
+    $('.black-bg').on('click', function (e) {
+      if ($(e.target).is('.black-bg')) {
+        $('.black-bg').fadeOut();
+      }
+    })
+
+    //canvas
+
+    var canvas = document.getElementById('canvas');
+    var c = canvas.getContext('2d');
+
+    $('.black-bg button').eq(0).on('click', function () {
+      $('.black-bg').fadeOut();
+      $('.none-bg').fadeIn();
+
+      var now = new Date();
+      let nowYear = now.getFullYear();
+      let nowMonth = now.getMonth();
+      let nowDay = now.getDate();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      let seconds = now.getSeconds();
+
+      c.font = '20px dotum';
+      c.font = 'bold 13px Arial';
+      c.clearRect(0, 0, 300, 30);
+      c.fillText(`${nowYear}-${nowMonth+1}-${nowDay}  ${hours}:${minutes}:${seconds}`, 30, 20)
+      cartElements.forEach((a,i) => {
+        let title = $(`#${a}`).find('.card-title').html()
+        let company = $(`#${a}`).find('.text-body-secondary').html()
+        let price = $(`#cart-drop #${a}`).find('.card-price').html()
+        let count = $(`#cart-drop #${a}`).find('.cart-count').html()
+        let total = price * count
+
+        c.fillText(title, 30, 70 + 120 * i)
+        c.fillText(company, 30, 90 + 120 * i)
+        c.fillText('가격 : ' + price, 30, 110 + 120 * i)
+        c.fillText('수량 : ' + count, 30, 130 + 120 * i)
+        c.fillText('합계 : ' + total, 30, 150 + 120 * i)
+
+      })
+
+      let allTotal = $('.cart-total').html() 
+      c.fillText('총' + allTotal,30,450)
+    })
+
+    $('.receipt button').on('click', function () {
+      $('.none-bg').fadeOut();
+    })
 
   </script>
 
